@@ -161,7 +161,7 @@ export const DocumentEditor = ({ document, onSaveSuccess, onDeleteSuccess, theme
 
   return (
     <div className="tiptap-editor-container" data-color-mode={theme}>
-      <div style={{ padding: 24, display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)' }}>
+      <div style={{ padding: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, borderBottom: '1px solid var(--border-color)' }}>
         <Input
           size="large"
           placeholder="Document Title"
@@ -178,7 +178,8 @@ export const DocumentEditor = ({ document, onSaveSuccess, onDeleteSuccess, theme
             backgroundColor: 'transparent',
             color: 'var(--text-color)',
             boxShadow: 'none',
-            width: '60%',
+            flex: 1,
+            minWidth: 'min(100%, 200px)',
             fontFamily: 'inherit'
           }}
         />
