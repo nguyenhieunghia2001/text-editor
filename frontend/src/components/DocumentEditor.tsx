@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react';
-import { Input, Button, Space, message, Popconfirm } from 'antd';
-import { SaveOutlined, DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { Input, Button, Space, message, Popconfirm, Dropdown } from 'antd';
+import type { MenuProps } from 'antd';
+import { SaveOutlined, DeleteOutlined, EditOutlined, TableOutlined, DownOutlined } from '@ant-design/icons';
 import { useEditor, EditorContent, ReactNodeViewRenderer } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Color } from '@tiptap/extension-color';
 import { TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { CodeBlockLowlight } from '@tiptap/extension-code-block-lowlight';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
 import { common, createLowlight } from 'lowlight';
 import { CodeBlockNodeView } from './CodeBlockNodeView';
 import { createDocument, updateDocument, deleteDocument } from '../api/documents';
@@ -23,6 +28,68 @@ interface DocumentEditorProps {
 
 const EditorToolbar = ({ editor }: { editor: any }) => {
   if (!editor) return null;
+
+  const tableMenuProps: MenuProps = {
+    items: [
+      {
+        key: 'insertTable',
+        label: 'Insert Table',
+        onClick: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+      },
+      {
+        key: 'deleteTable',
+        label: 'Delete Table',
+        onClick: () => editor.chain().focus().deleteTable().run(),
+        disabled: !editor.isActive('table'),
+      },
+      { type: 'divider' },
+      {
+        key: 'addColumnBefore',
+        label: 'Add Column Before',
+        onClick: () => editor.chain().focus().addColumnBefore().run(),
+        disabled: !editor.isActive('table'),
+      },
+      {
+        key: 'addColumnAfter',
+        label: 'Add Column After',
+        onClick: () => editor.chain().focus().addColumnAfter().run(),
+        disabled: !editor.isActive('table'),
+      },
+      {
+        key: 'deleteColumn',
+        label: 'Delete Column',
+        onClick: () => editor.chain().focus().deleteColumn().run(),
+        disabled: !editor.isActive('table'),
+      },
+      { type: 'divider' },
+      {
+        key: 'addRowBefore',
+        label: 'Add Row Before',
+        onClick: () => editor.chain().focus().addRowBefore().run(),
+        disabled: !editor.isActive('table'),
+      },
+      {
+        key: 'addRowAfter',
+        label: 'Add Row After',
+        onClick: () => editor.chain().focus().addRowAfter().run(),
+        disabled: !editor.isActive('table'),
+      },
+      {
+        key: 'deleteRow',
+        label: 'Delete Row',
+        onClick: () => editor.chain().focus().deleteRow().run(),
+        disabled: !editor.isActive('table'),
+      },
+      { type: 'divider' },
+      {
+        key: 'toggleHeaderCell',
+        label: 'Toggle Header Cell',
+        onClick: () => editor.chain().focus().toggleHeaderCell().run(),
+        disabled: !editor.isActive('table'),
+      }
+    ]
+  };
+
   return (
     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', padding: '12px 24px', borderBottom: '1px solid var(--border-color)', background: 'var(--hover-bg)' }}>
       <Button 
@@ -60,6 +127,15 @@ const EditorToolbar = ({ editor }: { editor: any }) => {
       >
         Code Block
       </Button>
+      <Dropdown menu={tableMenuProps} trigger={['click']}>
+        <Button size="small" type={editor.isActive('table') ? 'primary' : 'default'}>
+          <Space>
+            <TableOutlined />
+            Table
+            <DownOutlined />
+          </Space>
+        </Button>
+      </Dropdown>
       <input 
         type="color" 
         title="Text Color"
@@ -90,6 +166,12 @@ export const DocumentEditor = ({ document, onSaveSuccess, onDeleteSuccess, theme
           return ReactNodeViewRenderer(CodeBlockNodeView);
         },
       }).configure({ lowlight }),
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
     ],
     content: content,
     editable: isEditing,
